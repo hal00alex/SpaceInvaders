@@ -1,0 +1,35 @@
+#include "..//inc/tm4c123gh6pm.h"
+#include "SpaceInvaders.h" 
+int32_t delay_B; 
+uint32_t data_B; 
+volatile unsigned long FallingEdges = 0; 
+void ButtonInit(void){
+	//delay for clock
+	SYSCTL_RCGCGPIO_R |= 0x2F; 
+	delay_B = 0x11111111;
+	delay_B = 0x22222222; 
+	delay_B = 0x33333333; 
+	//enable PE0 as an input 
+	GPIO_PORTC_DIR_R &= ~0x10;
+	GPIO_PORTC_AFSEL_R &= ~0x10; 
+	GPIO_PORTC_DEN_R |= 0x10; 
+	//enable interrupt vectors  
+	GPIO_PORTC_AMSEL_R = 0;       //     disable analog functionality on PF
+  //GPIO_PORTF_PUR_R |= 0x10;     //    
+	GPIO_PORTC_IS_R &= ~0x10; 
+	GPIO_PORTC_IBE_R &= ~0x10; 
+	GPIO_PORTC_IEV_R &= ~0x10; 
+	GPIO_PORTC_ICR_R = 0x10;
+	GPIO_PORTC_IM_R |= 0x10; 
+	NVIC_PRI0_R = (NVIC_PRI0_R&0xFF00FFFF)|0x00A00000; 
+	NVIC_EN0_R |= 4; 
+}
+uint32_t ButtonPush (void){
+	//uses PF4 for simulator test 
+	//hardware may not be working at the moment 
+	//when swith is pressed, data = 1
+	//because negative logic 
+	data_B = GPIO_PORTC_DATA_R; 
+	//data_B &= ~0x0001; 
+	return data_B; 
+} 
